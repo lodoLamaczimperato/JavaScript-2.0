@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Gradienty i efekty tekstowe</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1e3c72, #2a5298); /* gradient liniowy */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .container {
+            background: radial-gradient(circle at top, #ffffff33, #00000066); /* gradient radialny */
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5); /* cień diva */
+            text-align: center;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        .name {
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-shadow: 4px 4px 8px black; /* imię z cieniem */
+        }
+
+        /* Efekt 1 – neon */
+        .text-neon {
+            font-size: 24px;
+            text-shadow: 0 0 5px #00ffff, 0 0 15px #00ffff;
+            margin: 15px 0;
+        }
+
+        /* Efekt 2 – kontur */
+        .text-outline {
+            font-size: 24px;
+            color: transparent;
+            -webkit-text-stroke: 1px white;
+            margin: 15px 0;
+        }
+
+        /* Efekt 3 – gradient tekstu */
+        .text-gradient {
+            font-size: 24px;
+            background: linear-gradient(90deg, #ff8a00, #e52e71);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="name">Kewin</div>
+
+        <div class="text-neon">Efekt neonowy</div>
+        <div class="text-outline">Efekt konturu</div>
+        <div class="text-gradient">Efekt gradientowego tekstu</div>
+    </div>
+</body>
+</html>
