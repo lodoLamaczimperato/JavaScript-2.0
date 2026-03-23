@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>Rocket Game z tłem</title>
+<style>
+  body { margin: 0; overflow: hidden; }
+  canvas { display: block; background: black; }
+</style>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+
+<script>
+const canvas = document.getElementById("c");
+const ctx = canvas.getContext("2d");
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener("resize", resize);
+
+let mouse = { x: canvas.width/2, y: canvas.height - 100 };
+canvas.addEventListener("mousemove", e => {
+  mouse.x = e.clientX;
+});
+
+let rocket = { x: mouse.x, y: mouse.y };
+let asteroids = [];
+let score = 0;
+let stars = [];
+let planets = [];
+
+// losowe gwiazdy tła
+for (let i = 0; i < 100; i++) {
+  stars.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    size: Math.random()*2
+  });
+}
+
+// losowe planety tła
+planets.push({x: 200, y: 150, r: 50, color: "#ef4444"});
+planets.push({x: canvas.width - 300, y: 250, r: 70, color: "#22c55e"});
+planets.push({x: 500, y: 100, r: 40, color: "#ddd"});
+
+let t = 0;
+
+function drawBackground() {
+  // ciemne niebo
+  ctx.fillStyle = "#0b0c10";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // gwiazdy
+  stars.forEach(s => {
+    ctx.fillStyle = "white";
+    ctx.fillRect(s.x, s.y, s.size, s.size);
+  });
+
+  // mgławica (gradient)
+  let grad = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 50, canvas.width/2, canvas.height/2, canvas.width);
+  grad.addColorStop(0, "rgba(255,255,255,0.05)");
+  grad.addColorStop(1, "rgba(0,0,0,0.8)");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  // planety
+  planets.forEach(p => {
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+    ctx.fill();
+  });
+}
+
+// rysowanie rakiety
+function drawRocket(x, y, angle) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(angle);
+
+  let g = ctx.createLinearGradient(0, -30, 0, 30);
+  g.addColorStop(0, "#fff");
+  g.addColorStop(1, "#888");
+
+  ctx.fillStyle = g;
+  ctx.fillRect(-8, -30, 16, 50);
+
+  ctx.beginPath();
+  ctx.moveTo(-8, -30);
+  ctx.quadraticCurveTo(0, -50, 8, -30);
+  ctx.fill();
+
+  ctx.fillStyle = "red";
+  ctx.beginPath();
+  ctx.moveTo(-8, 10);
+  ctx.lineTo(-20, 20);
+  ctx.lineTo(-8, 20);
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.moveTo(8, 10);
+  ctx.lineTo(20, 20);
+  ctx.lineTo(8, 20);
+  ctx.fill();
+
+  ctx.fillStyle = "cyan";
+  ctx.beginPath();
+  ctx.arc(0, -5, 4, 0, Math.PI*2);
+  ctx.fill();
+
+  // ogień
+  ctx.fillStyle = "orange";
+  ctx.beginPath();
+  ctx.moveTo(-5, 20);
+  ctx.quadraticCurveTo(0, 30 + Math.sin(t)*10, 5, 20);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+// asteroidy
+function drawAsteroid(a) {
+  ctx.fillStyle = "#6b7280";
+  ctx.beginPath();
+  ctx.arc(a.x, a.y, a.r, 0, Math.PI*2);
+  ctx.fill();
+}
+
+function spawnAsteroid() {
+  asteroids.push({
+    x: Math.random() * canvas.width,
+    y: -20,
+    r: 10 + Math.random()*15,
+    speed: 2 + Math.random()*3
+  });
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  drawBackground();
+
+  rocket.x += (mouse.x - rocket.x) * 0.1;
+  let angle = Math.atan2(-1, mouse.x - rocket.x);
+  drawRocket(rocket.x, rocket.y, angle);
+
+  if (Math.random() < 0.03) spawnAsteroid();
+
+  for (let i = 0; i < asteroids.length; i++) {
+    let a = asteroids[i];
+    a.y += a.speed;
+    drawAsteroid(a);
+
+    let dx = rocket.x - a.x;
+    let dy = rocket.y - a.y;
+    let dist = Math.sqrt(dx*dx + dy*dy);
+
+    if (dist < a.r + 10) {
+      score = 0;
+      asteroids = [];
+      alert("Game Over!");
+    }
+
+    if (a.y > canvas.height) {
+      score++;
+      asteroids.splice(i, 1);
+      i--;
+    }
+  }
+
+  ctx.fillStyle = "white";
+  ctx.fillText("Score: " + score, 20, 30);
+  ctx.strokeStyle = "#38bdf8";
+  ctx.strokeText("Rocket Game", 20, 50);
+
+  t += 0.2;
+  requestAnimationFrame(draw);
+}
+
+draw();
+</script>
+
+</body>
+</html>
